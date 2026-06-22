@@ -1,0 +1,6 @@
+{
+  "name": "CIKAY Elevator",
+  "description": "Premium industrial & luxury elevator solutions by CIKAY Elevator Pvt Ltd.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
