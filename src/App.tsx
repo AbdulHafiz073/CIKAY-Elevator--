@@ -24,6 +24,8 @@ import {
 
 import { LoadingScreen } from "./components/LoadingScreen";
 import { Navbar } from "./components/Navbar";
+import { Sidebar } from "./components/Sidebar";
+import { GalleryFloor } from "./components/GalleryFloor";
 import { ElevatorShaft } from "./components/ElevatorShaft";
 import { LuxuryLift } from "./components/LuxuryLift";
 import { BuildingLift } from "./components/BuildingLift";
@@ -43,6 +45,7 @@ interface LiftConfig {
 
 export default function App() {
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Lift configuration state
   const [config, setConfig] = useState<LiftConfig>({
@@ -114,7 +117,8 @@ export default function App() {
       <LoadingScreen />
 
       <div className="min-h-screen bg-background text-foreground selection:bg-primary/30 selection:text-primary transition-colors duration-300">
-        <Navbar />
+        <Navbar onMenuClick={() => setSidebarOpen(true)} />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
         {/* 2. Scroll-Linked Elevator Shaft Visual Anchor */}
         <ElevatorShaft />
@@ -130,22 +134,22 @@ export default function App() {
               
               {/* Left Column Brand Presentation */}
               <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
-                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-semibold uppercase tracking-widest text-primary w-fit shadow-sm bounce-slow">
+                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass text-xs font-semibold uppercase tracking-widest text-[#dfa057] w-fit shadow-sm bounce-slow">
                   <Sparkles className="h-3.5 w-3.5" /> High-Performance Elevators
                 </span>
                 
                 <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
-                  Pioneering <span className="gold-text">Luxury Speed</span> & Robust Engineering
+                  Reliable Elevator <span className="gold-text">Solutions For </span>Modern Buildings
                 </h1>
                 
                 <p className="text-muted-foreground text-sm sm:text-base max-w-xl leading-relaxed">
-                  CIKAY Elevator Pvt Ltd redefines vertical transit with high-end German microprocessor controls, premium gearless traction machines, and mesmerizing aesthetic custom cabins. Experience travel of class.
+                  Installation, AMC, Repair & Modernization Services across residential, commercial and industrial projects.
                 </p>
 
                 {/* Industrial Stats badges */}
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t border-border/80">
                   <div>
-                    <div className="text-2xl sm:text-3xl font-display font-bold gold-text">1500+</div>
+                    <div className="text-2xl sm:text-3xl font-display font-bold gold-text">150+</div>
                     <div className="text-[10px] sm:text-xs uppercase tracking-wider text-muted-foreground">Lifts Active</div>
                   </div>
                   <div>
@@ -160,16 +164,16 @@ export default function App() {
 
                 <div className="flex flex-wrap gap-4 pt-6">
                   <a 
-                    href="#configurator" 
-                    className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-[var(--shadow-glow)] flex items-center gap-2 cursor-pointer"
+                    href="#contact" 
+                    className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-sm transition-all duration-300 hover:scale-[1.03] hover:shadow-[var(--shadow-glow)] flex items-center gap-2 cursor-pointer text-black"
                   >
-                    Custom Cabin Configurator <ArrowRight className="h-4 w-4" />
+                    Get Free Quote <ArrowRight className="h-4 w-4" />
                   </a>
                   <a 
-                    href="#contact" 
-                    className="px-6 py-3 rounded-full glass border border-border hover:border-primary/50 text-foreground transition-all font-semibold text-sm cursor-pointer"
+                    href="tel:+919639099990" 
+                    className="px-6 py-3 rounded-full glass border border-border hover:border-primary/50 text-foreground transition-all font-semibold text-sm cursor-pointer flex items-center gap-2"
                   >
-                    Get Free Feasibility Report
+                    Call Now
                   </a>
                 </div>
               </div>
@@ -209,33 +213,31 @@ export default function App() {
                 <div className="space-y-2">
                   <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">WHO WE ARE</span>
                   <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-                    Crafting Seamless, High-Safety Journeys Since Inception
+                    Engineered for safety, built for trust.
                   </h2>
                 </div>
 
                 <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
-                  CIKAY Elevator Private Limited has established itself as an engineering power-broker in the vertical transit sector. We design, manufacture, install, and service architectural passenger lifts, cargo systems, hospital stretcher complexes, capsule pods, and futuristic escalators.
+                  CIKAY Elevator Private Limited delivers reliable elevator installation, maintenance, modernization and repair services with a strong focus on safety, performance and customer satisfaction.
                 </p>
 
-                <p className="text-muted-foreground text-xs sm:text-sm">
-                  Our development focus rests heavily on eliminating risk mechanics. By matching premium high-tensile steel frames with German copper wire VVVF motors, our systems maintain effortless stability even under critical peak weight hours.
-                </p>
-
-                {/* Dynamic corporate values */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                  <div className="p-4 rounded-xl bg-card border border-border/80 flex gap-3">
-                    <Award className="h-6 w-6 text-primary shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-sm">ISO 9001:2015 Approved</h4>
-                      <p className="text-xs text-muted-foreground mt-1">Strictest manufacture standards for industrial installations</p>
-                    </div>
+                {/* Grid of four items */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-border/80">
+                  <div>
+                    <div className="text-xl sm:text-2xl font-display font-bold gold-text">1,000+</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground leading-tight">SERVICE VISIT</div>
                   </div>
-                  <div className="p-4 rounded-xl bg-card border border-border/80 flex gap-3">
-                    <Users className="h-6 w-6 text-primary shrink-0" />
-                    <div>
-                      <h4 className="font-semibold text-sm">Expert Field Operatives</h4>
-                      <p className="text-xs text-muted-foreground mt-1">24/7 localized structural help units in your metropolitan area</p>
-                    </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-display font-bold gold-text">500+</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground leading-tight">Satisfied Clients</div>
+                  </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-display font-bold gold-text">24/7</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground leading-tight">SUPPORT</div>
+                  </div>
+                  <div>
+                    <div className="text-xl sm:text-2xl font-display font-bold gold-text">100%</div>
+                    <div className="text-[9px] uppercase tracking-wider text-muted-foreground leading-tight">SAFETY COMMIT</div>
                   </div>
                 </div>
 
@@ -255,91 +257,235 @@ export default function App() {
           {/* FLOOR 6: CORE SERVICES & SYSTEMS (SERVICES) */}
           {/* ========================================================= */}
           <Floor id="services" number="6" label="Vertical Engineering">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              
-              {/* Left Column Services List */}
-              <div className="lg:col-span-7 space-y-6">
-                <div className="space-y-2">
-                  <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold font-display">SYSTEM RANGE</span>
-                  <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-                    Custom Engineered Lifting Mechanisms
-                  </h2>
-                  <p className="text-muted-foreground text-sm max-w-lg">
-                    Whether you are developing a modern high-rise commercial complex, a boutique duplex residency, or a crucial critical-care health hub, CIKAY delivers perfectly mapped lifting assets.
-                  </p>
-                </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center justify-center max-w-7xl mx-auto">
 
-                {/* Service Cards Layout */}
-                <div className="space-y-3.5 max-h-[500px] overflow-y-auto pr-3 scrollbar-thin">
-                  
-                  {/* Service Card 1 */}
-                  <div className="p-4 rounded-xl bg-card border border-border/80 hover:border-primary/40 transition-colors duration-300 group">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded font-mono group-hover:bg-primary group-hover:text-primary-foreground transition-colors">01</span>
-                        <h3 className="font-display font-semibold text-base transition-colors group-hover:text-primary">Passenger Luxury Traction Lifts</h3>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-primary transition-transform group-hover:translate-x-1" />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 pl-9">
-                      Equipped with gearless traction technology, high-end quiet operation, and customized marble or gold interior trim. Designed primarily for executive corporate hubs and high-rise condominiums.
-                    </p>
-                  </div>
-
-                  {/* Service Card 2 */}
-                  <div className="p-4 rounded-xl bg-card border border-border/80 hover:border-primary/40 transition-colors duration-300 group">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded font-mono group-hover:bg-primary group-hover:text-primary-foreground transition-colors">02</span>
-                        <h3 className="font-display font-semibold text-base transition-colors group-hover:text-primary">Heavy Stretcher Hospital Lifts</h3>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-primary transition-transform group-hover:translate-x-1" />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 pl-9">
-                      Specifically engineered with precise speed transition profiles to avoid passenger discomfort. Features antimicrobial stainless finish and reliable Automatic Rescue Device (ARD) default mapping.
-                    </p>
-                  </div>
-
-                  {/* Service Card 3 */}
-                  <div className="p-4 rounded-xl bg-card border border-border/80 hover:border-primary/40 transition-colors duration-300 group">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded font-mono group-hover:bg-primary group-hover:text-primary-foreground transition-colors">03</span>
-                        <h3 className="font-display font-semibold text-base transition-colors group-hover:text-primary">Bespoke Glass Capsule Pods</h3>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-primary transition-transform group-hover:translate-x-1" />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 pl-9">
-                      Panoramas centered beautifully. Full 180° or 360° clear visibility panels styled with brushed metals, creating majestic exterior accents for high-end boutique hotels and modern shopping arcades.
-                    </p>
-                  </div>
-
-                  {/* Service Card 4 */}
-                  <div className="p-4 rounded-xl bg-card border border-border/80 hover:border-primary/40 transition-colors duration-300 group">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded font-mono group-hover:bg-primary group-hover:text-primary-foreground transition-colors">04</span>
-                        <h3 className="font-display font-semibold text-base transition-colors group-hover:text-primary">Heavy Industrial Freight Elevators</h3>
-                      </div>
-                      <ChevronRight className="h-4 w-4 text-muted-foreground/60 group-hover:text-primary transition-transform group-hover:translate-x-1" />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2 pl-9">
-                      Engineered for intense warehouses. Built using high-impact structural checker-plates and robust gearboxes, holding capacities ranging up to 10 Metric Tons securely.
-                    </p>
-                  </div>
-                </div>
+              {/* Left Column: Lift Cutaway Diagram */}
+              <div className="lg:col-span-5 flex justify-center w-full max-w-md mx-auto relative">
+                <LiftCutaway className="w-full h-auto" />
               </div>
 
-              {/* Right Column Interactive Exploded View */}
-              <div className="lg:col-span-5 flex justify-center">
-                <div className="bg-card/30 rounded-2xl p-6 border border-border max-w-sm w-full relative">
-                  <h4 className="text-sm font-display font-bold gold-text text-center mb-1">INTERACTIVE CUTAWAY</h4>
-                  <p className="text-[10px] text-muted-foreground text-center mb-6">Exploded diagram of traction lift parameters</p>
-                  <LiftCutaway />
+              {/* Right Column: Anatomy of Service Info */}
+              <div className="lg:col-span-7 space-y-6 text-left">
+                {/* Badge: ANATOMY OF SERVICE */}
+                <div>
+                  <span className="inline-block px-4 py-1.5 border border-[#dfa057]/40 rounded-full text-xs font-mono font-bold tracking-[0.2em] text-[#dfa057] uppercase bg-[#dfa057]/5">
+                    Anatomy of Service
+                  </span>
                 </div>
+
+                {/* Heading: Every component we cover */}
+                <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-tight">
+                  Every component <span className="text-[#dfa057]">we cover</span>
+                </h2>
+
+                {/* Description */}
+                <p className="text-muted-foreground text-sm sm:text-base leading-relaxed max-w-xl">
+                  From the traction motor in the machine room to the buffer at the pit floor — our AMC, installation, repair and modernization services keep every moving part safe, smooth and certified.
+                </p>
+
+                {/* Two-Column Grid of Components with Golden Bullets */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 pt-4 max-w-xl">
+                  {/* Column 1 */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Traction Motor</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Steel Cables</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Cabin & Doors</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Safety Brake</span>
+                    </div>
+                  </div>
+
+                  {/* Column 2 */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Controller Panel</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Guide Rails</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Counterweight</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="h-2 w-2 rounded-full bg-[#dfa057]" />
+                      <span className="font-display font-medium text-base sm:text-lg text-foreground/90">Buffer / Pit</span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
             </div>
+
+            {/* 2x2 Grid of Main Services: AMC, Installation, Repair, Modernization */}
+            <div className="mt-16 pt-16 border-t border-border/40">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
+                
+                {/* 1. Lift AMC Card */}
+                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                  <div className="relative h-56 sm:h-64 w-full overflow-hidden">
+                    <img 
+                      src="https://images.unsplash.com/photo-1621905252507-b354bc25edac?auto=format&fit=crop&q=80&w=800"
+                      alt="Lift AMC Inspection and Maintenance"
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 left-4 h-12 w-12 rounded-xl bg-[#dfa057] flex items-center justify-center text-black shadow-lg">
+                      <Settings className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <div className="p-8 sm:p-10 flex flex-col justify-between flex-1">
+                    <div className="space-y-4">
+                      <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+                        Lift AMC
+                      </h3>
+                      <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                        Comprehensive annual maintenance contracts with scheduled inspections, control panel diagnostics and priority response.
+                      </p>
+                    </div>
+                    <div className="pt-6">
+                      <a 
+                        href="#contact" 
+                        className="inline-flex items-center gap-2 text-[#dfa057] text-sm font-semibold hover:underline group-hover:translate-x-1 transition-transform"
+                      >
+                        Learn more <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Lift Installation Card */}
+                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                  <div className="relative h-56 sm:h-64 w-full overflow-hidden">
+                    <img 
+                      src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=800"
+                      alt="Lift shaft structural installation"
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 left-4 h-12 w-12 rounded-xl bg-[#dfa057] flex items-center justify-center text-black shadow-lg">
+                      <Wrench className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <div className="p-8 sm:p-10 flex flex-col justify-between flex-1">
+                    <div className="space-y-4">
+                      <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+                        Lift Installation
+                      </h3>
+                      <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                        Turnkey installation of passenger, freight and capsule elevators — from shaft design to commissioning.
+                      </p>
+                    </div>
+                    <div className="pt-6">
+                      <a 
+                        href="#contact" 
+                        className="inline-flex items-center gap-2 text-[#dfa057] text-sm font-semibold hover:underline group-hover:translate-x-1 transition-transform"
+                      >
+                        Learn more <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Lift Repair Card */}
+                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                  <div className="relative h-56 sm:h-64 w-full overflow-hidden">
+                    <img 
+                      src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=800"
+                      alt="Lift Repair and AMC Maintenance"
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 left-4 h-12 w-12 rounded-xl bg-[#dfa057] flex items-center justify-center text-black shadow-lg">
+                      <Wrench className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <div className="p-8 sm:p-10 flex flex-col justify-between flex-1">
+                    <div className="space-y-4">
+                      <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+                        Lift Repair
+                      </h3>
+                      <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                        Emergency troubleshooting, high-precision calibration, and original spare part replacement to restore safe and responsive lift operation with zero delay.
+                      </p>
+                    </div>
+                    <div className="pt-6">
+                      <a 
+                        href="#contact" 
+                        className="inline-flex items-center gap-2 text-[#dfa057] text-sm font-semibold hover:underline group-hover:translate-x-1 transition-transform"
+                      >
+                        Learn more <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 4. Lift Modernization Card */}
+                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                  <div className="relative h-56 sm:h-64 w-full overflow-hidden">
+                    <img 
+                      src="https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&q=80&w=800"
+                      alt="Luxurious Lift cabin Interior and Modernization"
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 left-4 h-12 w-12 rounded-xl bg-[#dfa057] flex items-center justify-center text-black shadow-lg">
+                      <Sparkles className="h-5 w-5" />
+                    </div>
+                  </div>
+                  <div className="p-8 sm:p-10 flex flex-col justify-between flex-1">
+                    <div className="space-y-4">
+                      <h3 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
+                        Lift Modernization
+                      </h3>
+                      <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                        Elevate aging layouts with luxury architectural trims, energy-efficient gearless motors, and next-generation smart microprocessors.
+                      </p>
+                    </div>
+                    <div className="pt-6">
+                      <a 
+                        href="#contact" 
+                        className="inline-flex items-center gap-2 text-[#dfa057] text-sm font-semibold hover:underline group-hover:translate-x-1 transition-transform"
+                      >
+                        Learn more <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </Floor>
+
+
+          {/* ========================================================= */}
+          {/* FLOOR 5: VISUAL VAULT (GALLERY) */}
+          {/* ========================================================= */}
+          <Floor id="gallery" number="5" label="Bespoke Gallery">
+            <GalleryFloor onSelectImage={(details) => {
+              setFormData((prev) => ({
+                ...prev,
+                message: details
+              }));
+              const el = document.getElementById("contact");
+              if (el) {
+                el.scrollIntoView({ behavior: "smooth" });
+              }
+            }} />
           </Floor>
 
 
@@ -350,8 +496,8 @@ export default function App() {
             <div className="space-y-12">
               <div className="text-center space-y-3">
                 <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">THE CIKAY SHIELD</span>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-                  Why Leading Builders Choose CIKAY
+                <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-tight">
+                  Why Choose <span className="text-[#dfa057]">CIKAY</span>
                 </h2>
                 <p className="text-muted-foreground text-sm max-w-2xl mx-auto">
                   Every elevator in our inventory is backed by heavy-duty components and safety redundancies, ensuring consistent uptime and effortless client compliance reviews.
@@ -366,9 +512,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-4">
                     <ShieldCheck className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">Zero-Failure Safety Sockets</h3>
+                  <h3 className="font-display font-bold text-lg mb-2">Safety Compliance</h3>
                   <p className="text-xs text-muted-foreground leading-normal">
-                    Fitted with robust overspeed governors and dynamic safety clamps that mechanically anchor the cab immediately if safe operating velocities are ever breached.
+                    Installations and audits aligned with national elevator safety standards.
                   </p>
                 </div>
 
@@ -388,9 +534,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-4">
                     <Clock className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">Instant Rescue (ARD)</h3>
+                  <h3 className="font-display font-bold text-lg mb-2">Fast Response</h3>
                   <p className="text-xs text-muted-foreground leading-normal">
-                    If power lines fail, the integrated backup Automatic Rescue Device kicks in instantly to smoothly navigate the cabin to the nearest floor and unlock the doors safely.
+                    Priority dispatch with SLA-backed response times across all AMC plans.
                   </p>
                 </div>
 
@@ -469,7 +615,7 @@ export default function App() {
                           onClick={() => setConfig({ ...config, style: s })}
                           className={`px-4 py-2 text-xs rounded-lg border font-medium text-left transition-colors cursor-pointer ${
                             config.style === s 
-                              ? "bg-primary border-primary text-primary-foreground font-semibold" 
+                              ? "bg-primary border-primary text-[#060a12] font-semibold" 
                               : "bg-background/40 border-border text-foreground hover:border-primary/50"
                           }`}
                         >
@@ -494,7 +640,7 @@ export default function App() {
                           onClick={() => setConfig({ ...config, lighting: l })}
                           className={`px-3 py-2 text-[11px] rounded-lg border text-center transition-colors cursor-pointer ${
                             config.lighting === l 
-                              ? "bg-primary border-primary text-primary-foreground font-semibold" 
+                              ? "bg-primary border-primary text-[#060a12] font-semibold" 
                               : "bg-background/40 border-border text-foreground hover:border-primary/50"
                           }`}
                         >
@@ -518,7 +664,7 @@ export default function App() {
                           onClick={() => setConfig({ ...config, panel: p })}
                           className={`px-3 py-2 text-xs rounded-lg border text-left transition-colors cursor-pointer ${
                             config.panel === p 
-                              ? "bg-primary border-primary text-primary-foreground font-semibold" 
+                              ? "bg-primary border-primary text-[#060a12] font-semibold" 
                               : "bg-background/40 border-border text-foreground hover:border-primary/50"
                           }`}
                         >
@@ -544,16 +690,16 @@ export default function App() {
                 </div>
 
                 {/* Call-to-action */}
-                <div className="flex bg-primary/10 border border-primary/20 rounded-xl p-4 gap-3">
+                <div className="flex bg-primary/10 border border-primary/20 rounded-xl p-4 gap-3 text-left">
                   <Sparkle className="h-5 w-5 text-primary shrink-0 animate-pulse mt-0.5" />
                   <p className="text-xs text-muted-foreground leading-normal">
-                    Based on your selected material (<span className="text-foreground font-bold">{config.style}</span>), our standard fabrication delivery time is <span className="text-primary font-bold">14 Working Days</span>, fully shipped with dual mechanical rail stabilizers.
+                    Based on your selected material (<span className="text-foreground font-bold">{config.style}</span>), our fabrication delivery time is <span className="text-primary font-bold">14 Working Days</span>, shipped with dual mechanical rail stabilizers.
                   </p>
                 </div>
               </div>
 
               {/* Right Column Custom Live Spec readout sheet */}
-              <div className="lg:col-span-5">
+              <div className="lg:col-span-5 text-left">
                 <div className="p-6 rounded-2xl border border-primary/30 bg-card/60 relative overflow-hidden shadow-[var(--shadow-elegant)] space-y-6">
                   
                   {/* Luxury backing glow */}
@@ -601,7 +747,7 @@ export default function App() {
 
                   <a 
                     href="#contact"
-                    className="block text-center w-full bg-primary text-primary-foreground font-semibold py-3 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] hover:shadow-[var(--shadow-glow)] cursor-pointer"
+                    className="block text-center w-full bg-primary text-[#060a12] font-semibold py-3 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 hover:scale-[1.02] hover:shadow-[var(--shadow-glow)] cursor-pointer"
                     onClick={() => {
                       setFormData({
                         ...formData,
@@ -633,13 +779,13 @@ export default function App() {
 
               {/* Grid of Projects */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projectDetails.map((proj, idx) => (
+                {projectDetails.map((proj) => (
                   <div 
                     key={proj.id} 
                     className="group bg-card rounded-2xl overflow-hidden border border-border flex flex-col justify-between hover:border-primary/50 transition-all duration-300 shadow-sm"
                   >
                     {/* Project Image */}
-                    <div className="relative h-48 overflow-hidden bg-muted">
+                    <div className="relative h-48 overflow-hidden bg-muted font-sans text-left">
                       <img 
                         src={proj.image} 
                         alt={proj.title} 
@@ -651,7 +797,7 @@ export default function App() {
                     </div>
 
                     {/* Project Text contents */}
-                    <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div className="p-5 flex-1 flex flex-col justify-between text-left">
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
                           <h3 className="font-display font-medium text-lg leading-tight transition-colors group-hover:text-primary">{proj.title}</h3>
@@ -672,7 +818,7 @@ export default function App() {
                         </div>
                         <div>
                           <span className="text-muted-foreground block uppercase text-[8px]">Configuration:</span>
-                          <span className="text-foreground font-semibold">{proj.units}</span>
+                          <span className="text-foreground font-semibold text-[11px] truncate leading-none block">{proj.units}</span>
                         </div>
                       </div>
                     </div>
@@ -690,7 +836,7 @@ export default function App() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 pt-4">
               
               {/* Left Column Contact Mechanics Info */}
-              <div className="lg:col-span-5 space-y-6">
+              <div className="lg:col-span-5 space-y-6 text-left">
                 <div className="space-y-2">
                   <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">GET IN TOUCH</span>
                   <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
@@ -749,7 +895,7 @@ export default function App() {
 
               {/* Right Column Interactive Inquiry Form */}
               <div className="lg:col-span-7">
-                <div className="p-6 sm:p-8 rounded-2xl border border-border bg-card/40 backdrop-blur-sm shadow-[var(--shadow-elegant)]">
+                <div className="p-6 sm:p-8 rounded-2xl border border-border bg-card/40 backdrop-blur-sm shadow-[var(--shadow-elegant)] text-left">
                   
                   <AnimatePresence mode="wait">
                     {!quoteSubmitted ? (
@@ -760,7 +906,7 @@ export default function App() {
                         onSubmit={handleFormSubmit} 
                         className="space-y-4"
                       >
-                        <h3 className="font-display text-lg font-bold">Lobby Dispatch Advisory Unit</h3>
+                        <h3 className="font-display text-lg font-bold">Lobby Advisory Unit</h3>
                         <p className="text-xs text-muted-foreground">Fill in details for quick structural quote estimates</p>
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -771,7 +917,7 @@ export default function App() {
                               required
                               value={formData.name}
                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                              placeholder="e.g. Abdul Hafiz" 
+                              placeholder="Enter  Name" 
                               className="w-full text-xs font-sans px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/80 focus:outline-none focus:ring-1 focus:ring-primary/80"
                             />
                           </div>
@@ -782,14 +928,14 @@ export default function App() {
                               required
                               value={formData.phone}
                               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                              placeholder="e.g. +91 96390 99990" 
+                              placeholder="Enter Phone Number " 
                               className="w-full text-xs font-sans px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/80 focus:outline-none focus:ring-1 focus:ring-primary/80"
                             />
                           </div>
                         </div>
 
                         <div>
-                          <label className="block text-[10px] uppercase tracking-wider font-mono text-muted-foreground mb-1.5">Email Email Address *</label>
+                          <label className="block text-[10px] uppercase tracking-wider font-mono text-muted-foreground mb-1.5">Email Address *</label>
                           <input 
                             type="email" 
                             required
@@ -833,14 +979,14 @@ export default function App() {
                             rows={3}
                             value={formData.message}
                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                            placeholder="Provide any bespoke architectural height details, dimensions, or speed targets..." 
+                            placeholder="Provide Bespoke height details, dimensions, speed targets..." 
                             className="w-full text-xs font-sans px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/80 focus:outline-none focus:ring-1 focus:ring-primary/80"
                           ></textarea>
                         </div>
 
                         <button 
                           type="submit" 
-                          className="w-full font-display font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl bg-primary text-primary-foreground transition-all duration-300 hover:scale-[1.01] hover:shadow-[var(--shadow-glow)] cursor-pointer"
+                          className="w-full font-display font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl bg-primary text-black transition-all duration-300 hover:scale-[1.01] hover:shadow-[var(--shadow-glow)] cursor-pointer"
                         >
                           Send Advisory Dispatch Request
                         </button>
@@ -854,13 +1000,13 @@ export default function App() {
                         <div className="h-16 w-16 mx-auto rounded-full bg-primary/25 border border-primary text-primary flex items-center justify-center">
                           <CheckCircle2 className="h-8 w-8 animate-bounce" />
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 text-center">
                           <h3 className="font-display font-bold text-2xl gold-text">Request Dispatched Successfully!</h3>
                           <p className="text-xs text-muted-foreground max-w-md mx-auto">
                             Thank you <span className="text-foreground font-semibold">{formData.name}</span>! Your configuration specifics and contact details have been successfully transmitted to our engineering team.
                           </p>
                         </div>
-                        <div className="font-mono text-[10px] text-primary/85 bg-primary/10 border border-primary/20 rounded-lg p-3 max-w-sm mx-auto">
+                        <div className="font-mono text-[10px] text-[#060a12] bg-primary rounded-lg p-3 max-w-sm mx-auto font-bold">
                           REFERENCE TOKEN: CIKAY-LIFT-{(Math.random() * 100000).toFixed(0)}
                         </div>
                         <button 

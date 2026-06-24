@@ -1,7 +1,7 @@
 import { motion, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-const FLOORS = ["10", "8", "6", "4", "3", "2", "G"];
+const FLOORS = ["10", "8", "6", "5", "4", "3", "2", "G"];
 
 export function ElevatorShaft() {
   const { scrollYProgress } = useScroll();
