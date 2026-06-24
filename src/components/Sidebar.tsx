@@ -24,7 +24,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     { label: "Services", href: "#services" },
     { label: "Gallery", href: "#gallery" },
     { label: "Why Us", href: "#why" },
-    { label: "Projects", href: "#projects" },
+    { label: "Testimonials", href: "#testimonials" },
     { label: "Contact", href: "#contact" }
   ];
 

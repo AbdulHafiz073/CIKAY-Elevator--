@@ -19,7 +19,9 @@ import {
   Check, 
   ChevronRight,
   MessageSquare,
-  Sparkle
+  Sparkle,
+  Star,
+  Quote
 } from "lucide-react";
 
 import { LoadingScreen } from "./components/LoadingScreen";
@@ -46,6 +48,8 @@ interface LiftConfig {
 export default function App() {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userRating, setUserRating] = useState<number>(0);
+  const [hoverRating, setHoverRating] = useState<number>(0);
   
   // Lift configuration state
   const [config, setConfig] = useState<LiftConfig>({
@@ -68,7 +72,6 @@ export default function App() {
   });
 
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<number | null>(null);
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,39 +80,6 @@ export default function App() {
       // Auto-reset after some time
     }, 10000);
   };
-
-  const projectDetails = [
-    {
-      id: 1,
-      title: "Royal Regency Arcade",
-      location: "New Delhi, India",
-      floors: "18 Floors",
-      units: "4 Duplex High Speed Lifts",
-      type: "Commercial Hub",
-      desc: "Complete luxury gold marble design with German VVVF controller. Speed operates at 2.0 m/s with fully custom microprocessor sync.",
-      image: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=800"
-    },
-    {
-      id: 2,
-      title: "Elysium Premium Heights",
-      location: "Mumbai, India",
-      floors: "32 Floors",
-      units: "6 High-Rise Cabin Passenger Lifts",
-      type: "Residential Elite",
-      desc: "Ultra silent operation under 40dB, geared traction motors, smart energy regenerative drives saving up to 35% electricity.",
-      image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&q=80&w=800"
-    },
-    {
-      id: 3,
-      title: "Apollo Medical Care Facility",
-      location: "Dehradun, India",
-      floors: "8 Floors",
-      units: "2 Stretcher Lifts + 1 Dumbwaiter",
-      type: "Healthcare Hospital",
-      desc: "Sterile stainless-steel antimicrobial panels, absolute exact millimeter floor alignment logic for seamless stretcher transit.",
-      image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&q=80&w=800"
-    },
-  ];
 
   return (
     <>
@@ -765,65 +735,75 @@ export default function App() {
 
 
           {/* ========================================================= */}
-          {/* FLOOR 2: ARCHITECTURAL MARVELS & COMPLETED PROJECTS */}
+          {/* FLOOR 2:Trusted by industry leaders*/}
           {/* ========================================================= */}
-          <Floor id="projects" number="2" label="Completed Marvels">
-            <div className="space-y-10">
-              <div className="space-y-3">
-                <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">REAL PERFORMANCE</span>
-                <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">CIKAY Landmark Installations</h2>
+          <Floor id="testimonials" number="2" label="TRUSTED">
+            <div className="space-y-12">
+              <div className="text-center md:text-left space-y-3">
+              
+                <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
+                Trusted by<span className="text-[#dfa057]"> industry leaders</span>
+               
+                </h2>
                 <p className="text-muted-foreground text-sm max-w-xl">
-                  Inspect some of our prominent national installations, showcasing exceptional cabin finishes and multi-shaft high-speed coordinations.
+                  Trusted by industry leaders
                 </p>
               </div>
 
-              {/* Grid of Projects */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {projectDetails.map((proj) => (
-                  <div 
-                    key={proj.id} 
-                    className="group bg-card rounded-2xl overflow-hidden border border-border flex flex-col justify-between hover:border-primary/50 transition-all duration-300 shadow-sm"
-                  >
-                    {/* Project Image */}
-                    <div className="relative h-48 overflow-hidden bg-muted font-sans text-left">
-                      <img 
-                        src={proj.image} 
-                        alt={proj.title} 
-                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105" 
-                      />
-                      <div className="absolute top-3 left-3 bg-black/80 text-primary text-[9px] font-mono uppercase tracking-widest px-2.5 py-1 rounded border border-primary/30">
-                        {proj.type}
-                      </div>
+              {/* Testimonials Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* Testimonial 1 */}
+                <div className="group bg-card/40 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-border/85 flex flex-col justify-between hover:border-primary/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 relative text-left">
+                  <div className="absolute top-4 right-4 text-primary/10 font-serif text-6xl leading-none select-none">“</div>
+                  <div className="space-y-4 relative z-10">
+                    <div className="text-primary">
+                      <Quote className="h-6 w-6 fill-primary/20 text-primary" />
                     </div>
-
-                    {/* Project Text contents */}
-                    <div className="p-5 flex-1 flex flex-col justify-between text-left">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-display font-medium text-lg leading-tight transition-colors group-hover:text-primary">{proj.title}</h3>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-mono">
-                          <MapPin className="h-3 w-3 text-primary" /> {proj.location}
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed pt-1.5">
-                          {proj.desc}
-                        </p>
-                      </div>
-
-                      {/* Mini specs footer */}
-                      <div className="border-t border-border/80 pt-4 mt-4 grid grid-cols-2 gap-2 text-[10px] font-mono">
-                        <div>
-                          <span className="text-muted-foreground block uppercase text-[8px]">Floors:</span>
-                          <span className="text-foreground font-semibold">{proj.floors}</span>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground block uppercase text-[8px]">Configuration:</span>
-                          <span className="text-foreground font-semibold text-[11px] truncate leading-none block">{proj.units}</span>
-                        </div>
-                      </div>
-                    </div>
+                    <p className="text-sm sm:text-base text-foreground leading-relaxed italic">
+                      "CIKAY transformed our aging elevator system. The modernization was completed on schedule with zero disruption to residents."
+                    </p>
                   </div>
-                ))}
+                  <div className="border-t border-border/60 pt-4 mt-6">
+                    <h4 className="font-display font-bold text-sm text-foreground">Rajesh Kumar</h4>
+                    <p className="text-xs text-muted-foreground">Facility Manager, Skyline Residency</p>
+                  </div>
+                </div>
+
+                {/* Testimonial 2 */}
+                <div className="group bg-card/40 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-border/85 flex flex-col justify-between hover:border-primary/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 relative text-left">
+                  <div className="absolute top-4 right-4 text-primary/10 font-serif text-6xl leading-none select-none">“</div>
+                  <div className="space-y-4 relative z-10">
+                    <div className="text-primary">
+                      <Quote className="h-6 w-6 fill-primary/20 text-primary" />
+                    </div>
+                    <p className="text-sm sm:text-base text-foreground leading-relaxed italic">
+                      "Their AMC team is exceptional — proactive servicing, transparent reports and a response time we can actually rely on."
+                    </p>
+                  </div>
+                  <div className="border-t border-border/60 pt-4 mt-6">
+                    <h4 className="font-display font-bold text-sm text-foreground">Priya Nair</h4>
+                    <p className="text-xs text-muted-foreground">Operations Head, Meridian Hotels</p>
+                  </div>
+                </div>
+
+                {/* Testimonial 3 */}
+                <div className="group bg-card/40 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-border/85 flex flex-col justify-between hover:border-primary/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 relative text-left">
+                  <div className="absolute top-4 right-4 text-primary/10 font-serif text-6xl leading-none select-none">“</div>
+                  <div className="space-y-4 relative z-10">
+                    <div className="text-primary">
+                      <Quote className="h-6 w-6 fill-primary/20 text-primary" />
+                    </div>
+                    <p className="text-sm sm:text-base text-foreground leading-relaxed italic">
+                      "From installation to handover, CIKAY delivered a flawless experience. Safety compliance was their top priority throughout."
+                    </p>
+                  </div>
+                  <div className="border-t border-border/60 pt-4 mt-6">
+                    <h4 className="font-display font-bold text-sm text-foreground">Anand Verma</h4>
+                    <p className="text-xs text-muted-foreground">Project Director, Crescent Mall</p>
+                  </div>
+                </div>
+
               </div>
             </div>
           </Floor>
@@ -917,7 +897,7 @@ export default function App() {
                               required
                               value={formData.name}
                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                              placeholder="Enter  Name" 
+                              placeholder="e.g.Name" 
                               className="w-full text-xs font-sans px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/80 focus:outline-none focus:ring-1 focus:ring-primary/80"
                             />
                           </div>
@@ -928,7 +908,7 @@ export default function App() {
                               required
                               value={formData.phone}
                               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                              placeholder="Enter Phone Number " 
+                              placeholder="e.g. +91 96390 99990" 
                               className="w-full text-xs font-sans px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/80 focus:outline-none focus:ring-1 focus:ring-primary/80"
                             />
                           </div>
@@ -1036,12 +1016,82 @@ export default function App() {
           </Floor>
 
           {/* Elegant Page Footer */}
-          <footer className="border-t border-border mt-20 py-8 text-center text-xs font-mono text-muted-foreground/80 space-y-3 px-4">
-            <div className="flex justify-center mb-2">
-              <Logo size={28} />
+          <footer className="border-t border-border mt-20 py-12 px-6 bg-card/20 rounded-t-3xl">
+            <div className="max-w-4xl mx-auto flex flex-col items-center space-y-8">
+              
+              {/* Trust & Star Rating Badge Section */}
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-b border-border/60 pb-8 text-center md:text-left">
+                {/* Trust score column */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-center md:justify-start gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="h-4 w-4 fill-[#dfa057] text-[#dfa057]" />
+                    ))}
+                    <span className="ml-2 font-display font-bold text-foreground text-sm">4.9 / 5.0 Rating</span>
+                  </div>
+                  <h4 className="font-display font-semibold text-foreground text-base">Verified Safety & Performance</h4>
+                  <p className="text-xs text-muted-foreground leading-normal max-w-sm">
+                    Based on 512+ verified installations, annual maintenance inspections, and high-speed multi-tier elevator commissioning reviews.
+                  </p>
+                </div>
+
+                {/* Interactive Star Rating Column */}
+                <div className="flex flex-col items-center md:items-end justify-center space-y-3">
+                  <span className="text-xs font-mono uppercase text-primary font-bold tracking-wider">
+                    {userRating > 0 ? "Thank you for rating us!" : "Rate your CIKAY experience:"}
+                  </span>
+                  
+                  <div className="flex items-center gap-1.5">
+                    {[1, 2, 3, 4, 5].map((star) => {
+                      const isHighlighted = (hoverRating || userRating) >= star;
+                      return (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setUserRating(star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          className="p-1 focus:outline-none transition-all hover:scale-125 cursor-pointer"
+                          aria-label={`Rate ${star} stars`}
+                        >
+                          <Star 
+                            className={`h-6 w-6 transition-all duration-200 ${
+                              isHighlighted 
+                                ? "fill-[#dfa057] text-[#dfa057] drop-shadow-[0_0_8px_rgba(223,160,87,0.6)]" 
+                                : "text-muted-foreground/40 hover:text-primary/70"
+                            }`} 
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {userRating > 0 && (
+                    <motion.p 
+                      initial={{ opacity: 0, y: 5 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      className="text-[11px] font-mono text-primary font-semibold"
+                    >
+                      You rated us {userRating} Star{userRating > 1 ? "s" : ""}! We appreciate your support.
+                    </motion.p>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Brand & Credits */}
+              <div className="w-full flex flex-col items-center space-y-4 text-center">
+                <div className="flex justify-center">
+                  <Logo size={32} />
+                </div>
+                <div className="font-mono text-xs text-muted-foreground/80 space-y-2">
+                  <p>© {new Date().getFullYear()} CIKAY Elevator Private Limited. All Rights Reserved.</p>
+                  <p className="text-[10px] text-muted-foreground/50 max-w-xl mx-auto leading-relaxed">
+                    Designed with desktop scroll-synchronization & German standard VVVF elevator simulation. Safety compliance and ISO standard controls active.
+                  </p>
+                </div>
+              </div>
+
             </div>
-            <p>© {new Date().getFullYear()} CIKAY Elevator Private Limited. All Rights Reserved.</p>
-            <p className="text-[10px] text-muted-foreground/50">Designed with desktop scroll-synchronization & German standard VVVF elevator simulation.</p>
           </footer>
 
         </main>

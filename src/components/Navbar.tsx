@@ -16,7 +16,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           <a href="#services" className="transition hover:text-primary">Services</a>
           <a href="#gallery" className="transition hover:text-primary">Gallery</a>
           <a href="#why" className="transition hover:text-primary">Why Us</a>
-          <a href="#projects" className="transition hover:text-primary">Projects</a>
+          <a href="#testimonials" className="transition hover:text-primary">Testimonials</a>
           <a href="#contact" className="transition hover:text-primary">Contact</a>
         </nav>
         <div className="flex items-center gap-2">
