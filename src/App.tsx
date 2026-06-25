@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Wrench, 
@@ -46,7 +46,6 @@ interface LiftConfig {
 }
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRating, setUserRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
@@ -71,14 +70,109 @@ export default function App() {
     message: ""
   });
 
+  const [sentMessageBody, setSentMessageBody] = useState<string>("");
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [web3FormsKey, setWeb3FormsKey] = useState<string>(() => {
+    return localStorage.getItem("cikay_web3forms_key") || (import.meta as any).env?.VITE_WEB3FORMS_ACCESS_KEY || "";
+  });
+  const [showKeyConfig, setShowKeyConfig] = useState(false);
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  // SMTP Configuration state
+  const [isSmtpConfigured, setIsSmtpConfigured] = useState(false);
+  const [smtpRecipient, setSmtpRecipient] = useState("aabdulhafiz073@gmail.com");
+  const [isSimulatorResult, setIsSimulatorResult] = useState(false);
+  const [referenceToken, setReferenceToken] = useState<string>("");
+
+  useEffect(() => {
+    const checkSmtpStatus = async () => {
+      try {
+        const res = await fetch("/api/smtp-status");
+        if (res.ok) {
+          const data = await res.json();
+          setIsSmtpConfigured(!!data.isConfigured);
+          if (data.smtpTo) {
+            setSmtpRecipient(data.smtpTo);
+          }
+        }
+      } catch (err) {
+        console.warn("Unable to connect to SMTP status API", err);
+      }
+    };
+    checkSmtpStatus();
+  }, []);
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setQuoteSubmitted(true);
-    setTimeout(() => {
-      // Auto-reset after some time
-    }, 10000);
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    const token = `CIKAY-LIFT-${Math.floor(10000 + Math.random() * 90000)}`;
+    setReferenceToken(token);
+
+    // Consolidate all specifications and selections into a unified, readable email message body
+    const consolidatedMessage = `
+--- CLIENT INQUIRY & CONTACT ---
+Reference Token: ${token}
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone}
+Building Architecture Type: ${formData.buildingType}
+
+--- CABIN SPECIFICATIONS (FROM BESPOKE STUDIO) ---
+Cabin Material / Style: ${config.style}
+Ceiling Lighting Style: ${config.lighting}
+Control Panel (COP): ${config.panel}
+ARD Auto Rescue: ${config.hasARD ? "CONNECTED (VVVF Logic)" : "MANUAL CRANK"}
+Max Speed Target: ${config.speed}
+Max Capacity Target: ${config.capacity}
+Preconfigured Specs: ${formData.customSpecs || "None loaded"}
+
+--- CLIENT MESSAGE & SPECIAL NOTES ---
+${formData.message || "No custom message provided"}
+    `.trim();
+
+    setSentMessageBody(consolidatedMessage);
+
+    try {
+      const response = await fetch("/api/send-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          buildingType: formData.buildingType,
+          customSpecs: formData.customSpecs,
+          message: formData.message,
+          config: config,
+          referenceToken: token
+        })
+      });
+
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(`Server returned non-JSON response: ${text.substring(0, 100)}`);
+      }
+
+      if (response.ok && data.success) {
+        setIsSimulatorResult(!!data.simulator);
+        setQuoteSubmitted(true);
+      } else {
+        setSubmitError(data.message || "Failed to transmit via SMTP. Please verify configuration.");
+      }
+    } catch (err: any) {
+      setSubmitError(`Transmission failed: ${err.message || err}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -182,9 +276,9 @@ export default function App() {
               <div className="lg:col-span-7 space-y-6">
                 <div className="space-y-2">
                   <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">WHO WE ARE</span>
-                  <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-                    Engineered for safety, built for trust.
-                  </h2>
+                  <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-foreground leading-tight">
+                  Engineered for safety, <span className="text-[#dfa057]">Built for trust.</span>
+                </h2>
                 </div>
 
                 <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
@@ -306,10 +400,10 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-7xl mx-auto">
                 
                 {/* 1. Lift AMC Card */}
-                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                <div className="rounded-2xl bg-card border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
                   <div className="relative h-56 sm:h-64 w-full overflow-hidden">
                     <img 
-                      src="https://images.unsplash.com/photo-1621905252507-b354bc25edac?auto=format&fit=crop&q=80&w=800"
+                      src="/public/Lift AMC.jfif"
                       alt="Lift AMC Inspection and Maintenance"
                       className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
                       referrerPolicy="no-referrer"
@@ -339,7 +433,7 @@ export default function App() {
                 </div>
 
                 {/* 2. Lift Installation Card */}
-                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                <div className="rounded-2xl bg-card border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
                   <div className="relative h-56 sm:h-64 w-full overflow-hidden">
                     <img 
                       src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=800"
@@ -372,7 +466,7 @@ export default function App() {
                 </div>
 
                 {/* 3. Lift Repair Card */}
-                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                <div className="rounded-2xl bg-card border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
                   <div className="relative h-56 sm:h-64 w-full overflow-hidden">
                     <img 
                       src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=800"
@@ -405,7 +499,7 @@ export default function App() {
                 </div>
 
                 {/* 4. Lift Modernization Card */}
-                <div className="rounded-2xl bg-[#090e16]/60 border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
+                <div className="rounded-2xl bg-card border border-border/60 hover:border-[#dfa057]/50 hover:shadow-[var(--shadow-glow)] transition-all duration-300 flex flex-col overflow-hidden h-full group">
                   <div className="relative h-56 sm:h-64 w-full overflow-hidden">
                     <img 
                       src="https://images.unsplash.com/photo-1549488344-1f9b8d2bd1f3?auto=format&fit=crop&q=80&w=800"
@@ -493,9 +587,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-4">
                     <Cpu className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">German VVVF Microprocessors</h3>
+                  <h3 className="font-display font-bold text-lg mb-2">Experienced Technicians</h3>
                   <p className="text-xs text-muted-foreground leading-normal">
-                    Precision controller drives optimize current loops and door transition speeds, conserving up to 40% more energy compared to conventional systems.
+                  Factory-trained engineers with decades of combined field experience.
                   </p>
                 </div>
 
@@ -515,9 +609,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-4">
                     <Activity className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">Real-time Pulse Monitoring</h3>
+                  <h3 className="font-display font-bold text-lg mb-2">Genuine Parts</h3>
                   <p className="text-xs text-muted-foreground leading-normal">
-                    Smart diagnostic sensors trace rail friction, floor alignment millisecond offsets, and door mechanical fatigue to warn technicians of wear patterns way before fault codes trigger.
+                    SOEM-grade components for long-term reliability and safety compliance.
                   </p>
                 </div>
 
@@ -526,10 +620,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-4">
                     <Wrench className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">24/7 Red-Line Assistance</h3>
+                  <h3 className="font-display font-bold text-lg mb-2">24/7 Emergency Support</h3>
                   <p className="text-xs text-muted-foreground leading-normal">
-                    A dedicated emergency dispatch grid is standing by. All CIKAY client installations can trigger immediate direct cellular tickets if mechanical queries ever arise.
-                  </p>
+                  Round-the-clock helpline for breakdowns, entrapments and urgent service. </p>
                 </div>
 
                 {/* Card 6 */}
@@ -537,9 +630,9 @@ export default function App() {
                   <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center mb-4">
                     <Settings className="h-5 w-5 text-primary" />
                   </div>
-                  <h3 className="font-display font-bold text-lg mb-2">Millimeter Levelling Accuracy</h3>
+                  <h3 className="font-display font-bold text-lg mb-2">Affordable AMC Plans</h3>
                   <p className="text-xs text-muted-foreground leading-normal">
-                    Sensory leveling flags coordinate with the magnetic deceleration units, preventing any stepping trip hazards for wheelchair boundaries or medical carts.
+                    Flexible silver, gold and platinum maintenance plans for every building.
                   </p>
                 </div>
 
@@ -735,19 +828,15 @@ export default function App() {
 
 
           {/* ========================================================= */}
-          {/* FLOOR 2:Trusted by industry leaders*/}
+          {/* FLOOR 2: TESTIMONIALS */}
           {/* ========================================================= */}
           <Floor id="testimonials" number="2" label="TRUSTED">
             <div className="space-y-12">
               <div className="text-center md:text-left space-y-3">
-              
+                
                 <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
-                Trusted by<span className="text-[#dfa057]"> industry leaders</span>
-               
+                Trusted By <span className="text-[#dfa057]">Industry Leaders</span>
                 </h2>
-                <p className="text-muted-foreground text-sm max-w-xl">
-                  Trusted by industry leaders
-                </p>
               </div>
 
               {/* Testimonials Grid */}
@@ -820,7 +909,7 @@ export default function App() {
                 <div className="space-y-2">
                   <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">GET IN TOUCH</span>
                   <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight">
-                    Secure An Expert Structural Inspection
+                    Secure An Ex<span className="text-[#dfa057]">pert Structural Inspection</span>
                   </h2>
                 </div>
 
@@ -847,7 +936,7 @@ export default function App() {
                     </div>
                     <div>
                       <span className="text-muted-foreground block text-[9px] uppercase">Official Email</span>
-                      <a href="mailto:info@cikayelevator.com" className="text-foreground font-semibold hover:text-primary transition-colors text-sm">info@cikayelevator.com / contact@cikay.co</a>
+                      <a href="mailto:info@cikayelevator.com" className="text-foreground font-semibold hover:text-primary transition-colors text-sm">info@cikayelevator.com</a>
                     </div>
                   </div>
 
@@ -886,8 +975,85 @@ export default function App() {
                         onSubmit={handleFormSubmit} 
                         className="space-y-4"
                       >
-                        <h3 className="font-display text-lg font-bold">Lobby Advisory Unit</h3>
-                        <p className="text-xs text-muted-foreground">Fill in details for quick structural quote estimates</p>
+                        <div className="flex justify-between items-start flex-wrap gap-2 border-b border-border/60 pb-3">
+                          <div>
+                            <h3 className="font-display text-lg font-bold">Lobby Advisory Unit</h3>
+                            <p className="text-xs text-muted-foreground">Fill in details for quick structural quote estimates</p>
+                          </div>
+                          
+                          <div className="flex flex-col items-end gap-1.5">
+                            <span className={`inline-flex items-center gap-1.5 text-[10px] px-2.5 py-1 rounded-full font-mono border ${isSmtpConfigured ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25' : 'bg-amber-500/10 text-amber-400 border-amber-500/25'}`}>
+                              <span className={`h-1.5 w-1.5 rounded-full ${isSmtpConfigured ? 'bg-emerald-400 animate-pulse' : 'bg-amber-400'}`} />
+                              {isSmtpConfigured ? "SMTP Gateway: Active" : "SMTP Simulator Mode"}
+                            </span>
+                            <button 
+                              type="button"
+                              onClick={() => setShowKeyConfig(!showKeyConfig)}
+                              className="text-[10px] text-primary hover:underline transition-colors font-mono flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"
+                            >
+                              <Settings className="h-3 w-3" />
+                              {showKeyConfig ? "Hide Config" : "Check SMTP Settings"}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Interactive SMTP Connection Guide and configuration drawer */}
+                        <AnimatePresence>
+                          {showKeyConfig && (
+                            <motion.div 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              transition={{ duration: 0.25 }}
+                              className="overflow-hidden bg-background/60 border border-border/80 rounded-xl p-4.5 space-y-3 text-xs"
+                            >
+                              <div className="space-y-1">
+                                <h4 className="font-semibold text-foreground flex items-center gap-1.5">
+                                  <Sparkles className="h-3.5 w-3.5 text-primary" /> SMTP Email Server Dispatch Status
+                                </h4>
+                                <p className="text-muted-foreground text-[11px] leading-relaxed">
+                                  Submit real inquiries from this website and receive them straight to the designated SMTP inbox (<span className="text-foreground font-semibold">{smtpRecipient}</span>) in real-time.
+                                </p>
+                              </div>
+                              
+                              <div className="p-3 bg-card rounded-lg border border-border space-y-2 font-mono text-[11px]">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">SMTP Status:</span>
+                                  <span className={isSmtpConfigured ? "text-emerald-400 font-bold" : "text-amber-400 font-bold"}>
+                                    {isSmtpConfigured ? "● Fully Configured & Active" : "○ Running in Sandbox Simulator"}
+                                  </span>
+                                </div>
+                                <div className="flex justify-between border-t border-border/40 pt-1.5">
+                                  <span className="text-muted-foreground">Target Recipient:</span>
+                                  <span className="text-foreground">{smtpRecipient}</span>
+                                </div>
+                              </div>
+
+                              <p className="text-[11px] text-muted-foreground leading-normal">
+                                To send actual emails directly via your custom mail server (e.g., Gmail, Outlook, SendGrid), update the SMTP environment variables in your <span className="text-foreground font-mono">.env</span> file:
+                              </p>
+                              
+                              <pre className="p-2.5 bg-zinc-950 text-emerald-400 font-mono text-[10px] rounded-lg overflow-x-auto leading-relaxed border border-border">
+{`# SMTP Email Credentials Config
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="465"
+SMTP_USER="your-gmail-address@gmail.com"
+SMTP_PASS="your-gmail-app-password"
+SMTP_TO="${smtpRecipient}"`}
+                              </pre>
+
+                              <p className="text-[10px] text-muted-foreground/60 italic">
+                                * Safe architecture is active. SMTP secrets are hidden safely on the backend server and never leaked to the client browser.
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+                        {submitError && (
+                          <div className="p-3.5 bg-destructive/10 border border-destructive/30 text-destructive text-xs rounded-xl font-mono">
+                            ⚠️ Error: {submitError}
+                          </div>
+                        )}
                         
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
@@ -897,7 +1063,7 @@ export default function App() {
                               required
                               value={formData.name}
                               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                              placeholder="e.g.Name" 
+                              placeholder="e.g. Your Name" 
                               className="w-full text-xs font-sans px-3.5 py-2.5 rounded-lg bg-background border border-border text-foreground placeholder:text-muted-foreground/50 focus:border-primary/80 focus:outline-none focus:ring-1 focus:ring-primary/80"
                             />
                           </div>
@@ -966,28 +1132,58 @@ export default function App() {
 
                         <button 
                           type="submit" 
-                          className="w-full font-display font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl bg-primary text-black transition-all duration-300 hover:scale-[1.01] hover:shadow-[var(--shadow-glow)] cursor-pointer"
+                          disabled={isSubmitting}
+                          className="w-full font-display font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl bg-primary text-black transition-all duration-300 hover:scale-[1.01] hover:shadow-[var(--shadow-glow)] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
-                          Send Advisory Dispatch Request
+                          {isSubmitting ? (
+                            <>
+                              <span className="h-4 w-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                              Transmitting Advisory Request...
+                            </>
+                          ) : (
+                            "Send Advisory Dispatch Request"
+                          )}
                         </button>
                       </motion.form>
                     ) : (
                       <motion.div 
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="text-center py-12 space-y-5"
+                        className="text-center py-8 space-y-6"
                       >
                         <div className="h-16 w-16 mx-auto rounded-full bg-primary/25 border border-primary text-primary flex items-center justify-center">
                           <CheckCircle2 className="h-8 w-8 animate-bounce" />
                         </div>
                         <div className="space-y-2 text-center">
-                          <h3 className="font-display font-bold text-2xl gold-text">Request Dispatched Successfully!</h3>
-                          <p className="text-xs text-muted-foreground max-w-md mx-auto">
-                            Thank you <span className="text-foreground font-semibold">{formData.name}</span>! Your configuration specifics and contact details have been successfully transmitted to our engineering team.
+                          <h3 className="font-display font-bold text-2xl gold-text">
+                            {!isSimulatorResult ? "Inquiry Dispatched via SMTP!" : "Request Processed!"}
+                          </h3>
+                          <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
+                            {!isSimulatorResult ? (
+                              <>
+                                Thank you <span className="text-foreground font-semibold">{formData.name}</span>! Your complete elevator specifications and contact details have been successfully emailed via SMTP directly to <span className="text-foreground font-semibold">{smtpRecipient}</span> in real-time.
+                              </>
+                            ) : (
+                              <>
+                                Thank you <span className="text-foreground font-semibold">{formData.name}</span>! Your structural specifications have been processed in Sandbox Simulator. <br />
+                                <span className="text-amber-500 font-semibold text-[11px] block mt-1">To receive actual email notifications directly to your Gmail inbox, configure the SMTP server credentials (SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_TO) in your environment variables.</span>
+                              </>
+                            )}
                           </p>
                         </div>
-                        <div className="font-mono text-[10px] text-[#060a12] bg-primary rounded-lg p-3 max-w-sm mx-auto font-bold">
-                          REFERENCE TOKEN: CIKAY-LIFT-{(Math.random() * 100000).toFixed(0)}
+
+                        {/* Emailed Specs Details Preview */}
+                        <div className="text-left bg-background/80 rounded-xl border border-border p-4 max-w-xl mx-auto space-y-2">
+                          <p className="text-[10px] font-mono uppercase text-primary font-bold tracking-widest border-b border-border pb-1">
+                            TRANSMITTED MESSAGE SPECIFICATIONS PREVIEW:
+                          </p>
+                          <pre className="text-[10px] font-mono text-foreground/80 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+                            {sentMessageBody}
+                          </pre>
+                        </div>
+
+                        <div className="font-mono text-[10px] text-[#060a12] bg-primary rounded-lg p-3 max-w-sm mx-auto font-bold animate-pulse">
+                          REFERENCE TOKEN: {referenceToken || "CIKAY-LIFT-55266"}
                         </div>
                         <button 
                           onClick={() => {
@@ -1078,17 +1274,73 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Bottom Brand & Credits */}
-              <div className="w-full flex flex-col items-center space-y-4 text-center">
-                <div className="flex justify-center">
+              {/* Bottom Brand, Links, & Contact Grid */}
+              <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8 pt-8 border-t border-border/40 text-left">
+                {/* Brand Column */}
+                <div className="flex flex-col items-start space-y-4">
                   <Logo size={32} />
-                </div>
-                <div className="font-mono text-xs text-muted-foreground/80 space-y-2">
-                  <p>© {new Date().getFullYear()} CIKAY Elevator Private Limited. All Rights Reserved.</p>
-                  <p className="text-[10px] text-muted-foreground/50 max-w-xl mx-auto leading-relaxed">
-                    Designed with desktop scroll-synchronization & German standard VVVF elevator simulation. Safety compliance and ISO standard controls active.
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-xs">
+                  CIKAY Elevator Private Limited — reliable elevator installation, AMC, repair and modernization for modern India.
                   </p>
                 </div>
+
+                {/* Quick Links Column */}
+                <div className="space-y-4">
+                  <h4 className="font-display font-semibold text-foreground text-sm tracking-wide">
+                    <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">Quick Links</span>
+                  </h4>
+                  <ul className="space-y-2 text-xs text-muted-foreground font-mono">
+                    <li>
+                      <a href="#why" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                        <ChevronRight className="h-3 w-3 text-primary" /> About
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#services" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                        <ChevronRight className="h-3 w-3 text-primary" /> Services
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#testimonials" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                        <ChevronRight className="h-3 w-3 text-primary" /> Projects
+                      </a>
+                    </li>
+                    <li>
+                      <a href="#contact" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                        <ChevronRight className="h-3 w-3 text-primary" /> Contact
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Contact Info Column */}
+                <div className="space-y-4">
+                  <h4 className="font-display font-semibold text-foreground text-sm tracking-wide">
+                    <span className="text-primary font-mono text-xs uppercase tracking-[0.2em] font-semibold">Contact</span>
+                  </h4>
+                  <ul className="space-y-3 text-xs text-muted-foreground font-mono">
+                    <li className="flex items-center gap-2">
+                      <PhoneCall className="h-3.5 w-3.5 text-primary" />
+                      <a href="tel:+919639099990" className="hover:text-primary transition-colors">+91 96390 99990</a>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Mail className="h-3.5 w-3.5 text-primary" />
+                      <a href="mailto:sales@cikayelevator.com" className="hover:text-primary transition-colors">sales@cikayelevator.com</a>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Mail className="h-3.5 w-3.5 text-primary" />
+                      <a href="mailto:info@cikayelevator.com" className="hover:text-primary transition-colors">info@cikayelevator.com</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Bottom Copyright and compliance info */}
+              <div className="w-full border-t border-border/40 pt-6 text-center font-mono text-[10px] text-muted-foreground/60 space-y-2">
+                <p>© {new Date().getFullYear()} CIKAY Elevator Private Limited. All Rights Reserved.</p>
+                <p className="max-w-xl mx-auto leading-relaxed">
+                  Designed with desktop scroll-synchronization & German standard VVVF elevator simulation. Safety compliance and ISO standard controls active.
+                </p>
               </div>
 
             </div>

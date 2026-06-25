@@ -93,7 +93,7 @@ export function GalleryFloor({ onSelectImage }: GalleryFloorProps) {
     <div className="space-y-10">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="text-left space-y-3 max-w-2xl">
-          <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-white">
+          <h2 className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
             Design <span className="text-[#dfa057]">Gallery</span>
           </h2>
           <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
@@ -110,7 +110,7 @@ export function GalleryFloor({ onSelectImage }: GalleryFloorProps) {
               className={`px-4 py-2 text-xs font-semibold rounded-full border transition-all duration-300 cursor-pointer ${
                 activeCategory === cat
                   ? "bg-[#dfa057] border-[#dfa057] text-black shadow-lg"
-                  : "bg-[#090e16]/60 border-border text-muted-foreground hover:border-[#dfa057]/50 hover:text-white"
+                  : "bg-card border-border text-muted-foreground hover:border-[#dfa057]/50 hover:text-foreground"
               }`}
             >
               {cat}
@@ -155,7 +155,7 @@ export function GalleryFloor({ onSelectImage }: GalleryFloorProps) {
                   {item.title}
                   <ZoomIn className="h-4 w-4 text-[#dfa057] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shrink-0" />
                 </h3>
-                <p className="text-[11px] text-muted-foreground/90 line-clamp-1 group-hover:line-clamp-none transition-all duration-300">
+                <p className="text-[11px] text-zinc-300 line-clamp-1 group-hover:line-clamp-none transition-all duration-300">
                   {item.description}
                 </p>
               </div>
@@ -215,20 +215,20 @@ export function GalleryFloor({ onSelectImage }: GalleryFloorProps) {
                     {selectedItem.title}
                   </h3>
                   <div className="h-px w-16 bg-[#dfa057]" />
-                  <p className="text-muted-foreground text-sm sm:text-base leading-relaxed">
+                  <p className="text-zinc-300 text-sm sm:text-base leading-relaxed">
                     {selectedItem.description}
                   </p>
 
                   <div className="space-y-2 pt-2">
-                    <div className="flex items-center gap-2.5 text-xs text-foreground/80">
+                    <div className="flex items-center gap-2.5 text-xs text-zinc-200">
                       <CheckCircle className="h-4 w-4 text-[#dfa057] shrink-0" />
                       <span>Premium Anti-Vibration Base Railings</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs text-foreground/80">
+                    <div className="flex items-center gap-2.5 text-xs text-zinc-200">
                       <CheckCircle className="h-4 w-4 text-[#dfa057] shrink-0" />
                       <span>Satin Finished Gold/Black Architectural Trim</span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs text-foreground/80">
+                    <div className="flex items-center gap-2.5 text-xs text-zinc-200">
                       <CheckCircle className="h-4 w-4 text-[#dfa057] shrink-0" />
                       <span>Digital VVVF Synchronized Door Controllers</span>
                     </div>

@@ -36,12 +36,12 @@ export function ElevatorShaft() {
           {FLOORS.map((f, i) => (
             <div
               key={f}
-              className="absolute left-0 right-0 flex items-center justify-between px-2 text-[10px] font-mono text-white/30"
+              className="absolute left-0 right-0 flex items-center justify-between px-2 text-[10px] font-mono text-foreground/50"
               style={{ top: `${(i / (FLOORS.length - 1)) * 92 + 4}%` }}
             >
-              <span className="h-px w-3 bg-white/20" />
+              <span className="h-px w-3 bg-foreground/20" />
               <span>{f}</span>
-              <span className="h-px w-3 bg-white/20" />
+              <span className="h-px w-3 bg-foreground/20" />
             </div>
           ))}
 
@@ -83,7 +83,7 @@ export function ElevatorShaft() {
           {FLOORS.map((f, i) => (
             <div
               key={f}
-              className="absolute left-0 right-0 flex items-center justify-center text-[8px] font-mono text-white/30"
+              className="absolute left-0 right-0 flex items-center justify-center text-[8px] font-mono text-foreground/50"
               style={{ top: `${(i / (FLOORS.length - 1)) * 92 + 4}%` }}
             >
               {f}
